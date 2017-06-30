@@ -1,7 +1,7 @@
-AWS Mining Node
+AWS NXT Node
 ===============
 
-An Ethereum mining node on AWS.
+An NXT node on AWS.
 
 Development
 -----------
