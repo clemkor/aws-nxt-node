@@ -1,0 +1,6 @@
+---
+components_bucket_name: "tobyclemson-mining-operations"
+
+region: "eu-west-2"
+
+image_repository_state_key: "nxt-node/deployment-state/image_repository/default.tfstate"

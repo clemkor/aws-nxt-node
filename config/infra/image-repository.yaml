@@ -1,0 +1,7 @@
+---
+vars:
+  region: "%{hiera('region')}"
+backend_config:
+  bucket: "%{hiera('components_bucket_name')}"
+  key: "%{hiera('image_repository_state_key')}"
+  region: "%{hiera('region')}"
