@@ -3,5 +3,8 @@ components_bucket_name: "eth-quest-components"
 
 region: "eu-west-2"
 
+deployment_identifier: "default"
+component: "nxt-node"
+
 image_repository_state_key: "nxt-node/deployment-state/image-repository/default.tfstate"
-secrets_bucket_state_key: "nxt-node/deployment-state/secrets-bucket/default.tfstate"
+secrets_bucket_state_key: "nxt-node/deployment-state/secrets-bucket/%{hiera('deployment_identifier')}.tfstate"

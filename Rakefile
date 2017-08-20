@@ -38,26 +38,6 @@ namespace :image_repository do
   end
 end
 
-namespace :secrets_bucket do
-  RakeTerraform.define_command_tasks do |t|
-    t.configuration_name = 'secrets bucket'
-    t.source_directory = 'infra/secrets_bucket'
-    t.work_directory = 'build'
-
-    t.backend_config = lambda do
-      configuration
-          .for_scope(role: 'secrets-bucket')
-          .backend_config
-    end
-
-    t.vars = lambda do
-      configuration
-          .for_scope(role: 'secrets-bucket')
-          .vars
-    end
-  end
-end
-
 namespace :image do
   RakeDocker.define_image_tasks do |t|
     t.image_name = 'aws-nxt'
@@ -97,5 +77,29 @@ namespace :image do
     end
 
     t.tags = ['latest']
+  end
+end
+
+namespace :secrets_bucket do
+  RakeTerraform.define_command_tasks do |t|
+    t.argument_names = [:deployment_identifier]
+
+    t.configuration_name = 'secrets bucket'
+    t.source_directory = 'infra/secrets_bucket'
+    t.work_directory = 'build'
+
+    t.backend_config = lambda do |args|
+      configuration
+          .for_args(args)
+          .for_scope(role: 'secrets-bucket')
+          .backend_config
+    end
+
+    t.vars = lambda do |args|
+      configuration
+          .for_args(args)
+          .for_scope(role: 'secrets-bucket')
+          .vars
+    end
   end
 end
