@@ -122,3 +122,27 @@ namespace :secrets_bucket do
     end
   end
 end
+
+namespace :service do
+  RakeTerraform.define_command_tasks do |t|
+    t.argument_names = [:deployment_identifier]
+
+    t.configuration_name = 'service'
+    t.source_directory = 'infra/service'
+    t.work_directory = 'build'
+
+    t.backend_config = lambda do |args|
+      configuration
+          .for_args(args)
+          .for_scope(role: 'service')
+          .backend_config
+    end
+
+    t.vars = lambda do |args|
+      configuration
+          .for_args(args)
+          .for_scope(role: 'service')
+          .vars
+    end
+  end
+end
