@@ -6,5 +6,12 @@ region: "eu-west-2"
 deployment_identifier: "default"
 component: "nxt-node"
 
+common_state_key: "environment/deployment-state/common/default.tfstate"
+network_state_key: "environment/deployment-state/network/%{hiera('deployment_identifier')}.tfstate"
+cluster_state_key: "environment/deployment-state/cluster/%{hiera('deployment_identifier')}.tfstate"
+
+image_version_key: "nxt-node/metadata/version"
+
 image_repository_state_key: "nxt-node/deployment-state/image-repository/default.tfstate"
 secrets_bucket_state_key: "nxt-node/deployment-state/secrets-bucket/%{hiera('deployment_identifier')}.tfstate"
+service_state_key: "nxt-node/deployment-state/service/%{hiera('deployment_identifier')}.tfstate"

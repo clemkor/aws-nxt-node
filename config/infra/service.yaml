@@ -1,0 +1,24 @@
+---
+vars:
+  region: "%{hiera('region')}"
+
+  component: "%{hiera('component')}"
+
+  peer_server_port: 7874
+  ui_server_port: 7875
+  api_server_port: 7876
+
+  desired_count: 1
+  deployment_maximum_percent: 100
+  deployment_minimum_healthy_percent: 0
+
+  state_bucket: "%{hiera('components_bucket_name')}"
+  common_state_key: "%{hiera('common_state_key')}"
+  network_state_key: "%{hiera('network_state_key')}"
+  cluster_state_key: "%{hiera('cluster_state_key')}"
+  image_repository_state_key: "%{hiera('image_repository_state_key')}"
+  secrets_bucket_state_key: "%{hiera('secrets_bucket_state_key')}"
+backend_config:
+  bucket: "%{hiera('components_bucket_name')}"
+  key: "%{hiera('service_state_key')}"
+  region: "%{hiera('region')}"

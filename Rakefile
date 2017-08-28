@@ -1,22 +1,33 @@
 $:.unshift File.join(File.dirname(__FILE__), 'lib')
 
-require 'securerandom'
-require 'git'
-require 'semantic'
 require 'rake_terraform'
 require 'rake_docker'
 
 require 'configuration'
+require 's3_version_file'
+require 'terraform_output'
 
 RakeTerraform.define_installation_tasks(
     path: File.join(Dir.pwd, 'vendor', 'terraform'),
     version: '0.9.8')
 
 configuration = Configuration.new
+version = S3VersionFile.new(
+    configuration.region,
+    configuration.components_bucket_name,
+    configuration.image_version_key,
+    'build/version')
 
 task :default => [
-    :'image_repository:plan'
+    :'image_repository:plan',
+    :'secrets_bucket:plan'
 ]
+
+namespace :version do
+  task :bump do
+    version.bump(:revision)
+  end
+end
 
 namespace :image_repository do
   RakeTerraform.define_command_tasks do |t|
@@ -53,7 +64,7 @@ namespace :image do
 
     t.repository_name = 'eth-quest/aws-nxt'
     t.repository_url = lambda do
-      configuration.terraform.output_for(
+      TerraformOutput.for(
           name: 'repository_url',
           source_directory: 'infra/image_repository',
           work_directory: 'build',
@@ -65,7 +76,7 @@ namespace :image do
     t.credentials = RakeDocker::Authentication::ECR.new do |c|
       c.region = configuration.region
       c.registry_id = lambda do
-        configuration.terraform.output_for(
+        TerraformOutput.for(
             name: 'registry_id',
             source_directory: 'infra/image_repository',
             work_directory: 'build',
@@ -76,8 +87,16 @@ namespace :image do
       end
     end
 
-    t.tags = ['latest']
+    t.tags = [version.to_s, 'latest']
   end
+
+  task :publish => [
+      'version:bump',
+      'image:clean',
+      'image:build',
+      'image:tag',
+      'image:push'
+  ]
 end
 
 namespace :secrets_bucket do
