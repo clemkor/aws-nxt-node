@@ -2,7 +2,7 @@
   {
     "name": "$${name}",
     "image": "$${image}",
-    "memoryReservation": 256,
+    "memoryReservation": 384,
     "essential": true,
     "command": $${command},
     "portMappings": [
