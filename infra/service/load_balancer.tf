@@ -3,7 +3,7 @@ module "load_balancer" {
 
   region = "${var.region}"
   vpc_id = "${data.terraform_remote_state.network.vpc_id}"
-  subnet_ids = "${data.terraform_remote_state.network.public_subnet_ids}"
+  subnet_ids = "${split(",", data.terraform_remote_state.network.public_subnet_ids)}"
 
   domain_name = "${data.terraform_remote_state.common.domain_name}"
   public_zone_id = "${data.terraform_remote_state.common.public_dns_zone_id}"
@@ -36,17 +36,17 @@ module "load_balancer" {
     {
       lb_port = "${var.peer_server_port}"
       instance_port = "${var.peer_server_port}"
-      access_cidr = "0.0.0.0/0"
+      allow_cidr = "0.0.0.0/0"
     },
     {
       lb_port = "${var.ui_server_port}"
       instance_port = "${var.ui_server_port}"
-      access_cidr = "${data.terraform_remote_state.network.vpc_cidr}"
+      allow_cidr = "${data.aws_vpc.network.cidr_block}"
     },
     {
       lb_port = "${var.api_server_port}"
       instance_port = "${var.api_server_port}"
-      access_cidr = "${data.terraform_remote_state.network.vpc_cidr}"
+      allow_cidr = "${data.aws_vpc.network.cidr_block}"
     }
   ]
 

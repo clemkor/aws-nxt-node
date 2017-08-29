@@ -7,3 +7,7 @@ data "terraform_remote_state" "network" {
     region = "${var.region}"
   }
 }
+
+data "aws_vpc" "network" {
+  id = "${data.terraform_remote_state.network.vpc_id}"
+}

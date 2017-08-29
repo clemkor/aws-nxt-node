@@ -20,7 +20,8 @@ version = S3VersionFile.new(
 
 task :default => [
     :'image_repository:plan',
-    :'secrets_bucket:plan'
+    :'secrets_bucket:plan',
+    :'service:plan'
 ]
 
 namespace :version do
@@ -87,7 +88,9 @@ namespace :image do
       end
     end
 
-    t.tags = [version.to_s, 'latest']
+    t.tags = lambda do
+      [version.refresh.to_s, 'latest']
+    end
   end
 
   task :publish => [
@@ -139,8 +142,11 @@ namespace :service do
     end
 
     t.vars = lambda do |args|
+      args_to_hash_merge = args.to_hash.merge(
+          'version_number' => version.refresh.to_s)
+      puts args_to_hash_merge
       configuration
-          .for_args(args)
+          .for_args(args_to_hash_merge)
           .for_scope(role: 'service')
           .vars
     end

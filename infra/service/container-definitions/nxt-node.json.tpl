@@ -12,7 +12,7 @@
       },
       {
         "containerPort": ${api_server_port},
-        "hostPort": ${api_server_http_port}
+        "hostPort": ${api_server_port}
       },
       {
         "containerPort": ${ui_server_port},
@@ -21,7 +21,7 @@
     ],
     "environment": [
       { "name": "AWS_REGION", "value": "$${region}" },
-      { "name": "SECRETS_BUCKET_NAME", "value": "${secrets_bucket_name}" }
+      { "name": "AWS_S3_CONFIGURATION_OBJECT", "value": "${aws_s3_configuration_object}" }
     ],
     "logConfiguration": {
       "logDriver": "awslogs",

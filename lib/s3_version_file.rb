@@ -17,6 +17,11 @@ class S3VersionFile
     put(bumped.to_s)
   end
 
+  def refresh
+    get_remote_file || write_local_file(@initial_version)
+    self
+  end
+
   def to_s
     read_local_file
   end

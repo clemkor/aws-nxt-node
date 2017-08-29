@@ -11,7 +11,7 @@ data "template_file" "task_container_definitions" {
   template = "${file("${path.root}/container-definitions/nxt-node.json.tpl")}"
 
   vars {
-    secrets_bucket_name = "${data.terraform_remote_state.secrets_bucket.bucket_name}"
+    aws_s3_configuration_object = "${data.template_file.env_url.rendered}"
 
     peer_server_port = "${var.peer_server_port}"
     ui_server_port = "${var.ui_server_port}"
@@ -36,7 +36,7 @@ module "service" {
 
   service_desired_count = "${var.desired_count}"
   service_deployment_maximum_percent = "${var.deployment_maximum_percent}"
-  service_deployment_minimum_helathy_percent = "${var.deployment_minimum_healthy_percent}"
+  service_deployment_minimum_healthy_percent = "${var.deployment_minimum_healthy_percent}"
 
   service_elb_name = "${module.load_balancer.name}"
 

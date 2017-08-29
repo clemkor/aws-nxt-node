@@ -24,4 +24,5 @@ cat /opt/nxt/conf/nxt.properties.template \
     | envsubst > /opt/nxt/conf/nxt.properties
 
 # Start NXT
-/opt/nxt/run.sh
+cd /opt/nxt
+./run.sh

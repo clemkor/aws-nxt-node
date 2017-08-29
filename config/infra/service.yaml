@@ -3,6 +3,9 @@ vars:
   region: "%{hiera('region')}"
 
   component: "%{hiera('component')}"
+  deployment_identifier: "%{hiera('deployment_identifier')}"
+
+  version_number: "%{hiera('version_number')}"
 
   peer_server_port: 7874
   ui_server_port: 7875
