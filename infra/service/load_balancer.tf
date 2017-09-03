@@ -1,5 +1,5 @@
 module "load_balancer" {
-  source = "github.com/infrablocks/terraform-aws-classic-load-balancer?ref=0.1.1//src"
+  source = "github.com/infrablocks/terraform-aws-classic-load-balancer?ref=0.1.3//src"
 
   region = "${var.region}"
   vpc_id = "${data.terraform_remote_state.network.vpc_id}"
