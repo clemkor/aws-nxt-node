@@ -51,6 +51,7 @@ module "load_balancer" {
   ]
 
   health_check_target = "TCP:${var.peer_server_port}"
+  health_check_unhealthy_threshold = 10
 
   include_public_dns_record = "yes"
   include_private_dns_record = "yes"
