@@ -20,10 +20,11 @@ module "load_balancer" {
       instance_protocol = "TCP"
     },
     {
-      lb_port = "${var.api_server_port}"
-      lb_protocol = "HTTP"
+      lb_port = "443"
+      lb_protocol = "HTTPS"
       instance_port = "${var.api_server_port}"
       instance_protocol = "HTTP"
+      ssl_certificate_id = "${data.aws_acm_certificate.wildcard.arn}"
     }
   ]
   access_control = [
