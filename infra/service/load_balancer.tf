@@ -46,7 +46,7 @@ module "load_balancer" {
     {
       lb_port = "${var.api_server_port}"
       instance_port = "${var.api_server_port}"
-      allow_cidr = "${data.aws_vpc.network.cidr_block}"
+      allow_cidr = "0.0.0.0/0"
     }
   ]
 
