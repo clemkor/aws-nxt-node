@@ -2,7 +2,7 @@ data "template_file" "env" {
   template = "${file("${path.root}/envfiles/default.env.tpl")}"
 
   vars {
-
+    admin_password = "${var.admin_password}"
   }
 }
 

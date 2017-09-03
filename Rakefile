@@ -1,5 +1,7 @@
 $:.unshift File.join(File.dirname(__FILE__), 'lib')
 
+require 'yaml'
+
 require 'rake_terraform'
 require 'rake_docker'
 
@@ -142,11 +144,19 @@ namespace :service do
     end
 
     t.vars = lambda do |args|
-      args_to_hash_merge = args.to_hash.merge(
-          'version_number' => version.refresh.to_s)
-      puts args_to_hash_merge
+      deployment_identifier =
+          configuration
+              .for_args(args)
+              .for_scope(role: 'service')
+              .deployment_identifier
+
+      nxt_node_config = YAML.load_file(
+          'config/secrets/nxt/%s.yaml' % deployment_identifier)
+
       configuration
-          .for_args(args_to_hash_merge)
+          .for_args(args.to_hash.merge(
+              'version_number' => version.refresh.to_s,
+              'admin_password' => nxt_node_config['admin_password']))
           .for_scope(role: 'service')
           .vars
     end
