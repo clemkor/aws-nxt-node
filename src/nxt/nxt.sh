@@ -32,7 +32,7 @@ cat conf/nxt.properties.template \
 # Fetch initial database archive if specified
 if [ -n "$NXT_INITIAL_BLOCKCHAIN_ARCHIVE_URL" ]; then
     mkdir tmp
-    curl -L "$NXT_INITIAL_BLOCKCHAIN_ARCHIVE_URL" -o tmp/blockchain_archive.zip
+    curl -sSL "$NXT_INITIAL_BLOCKCHAIN_ARCHIVE_URL" -o tmp/blockchain_archive.zip
     unzip tmp/blockchain_archive.zip -d nxt_db
     rm -rf tmp
 fi
