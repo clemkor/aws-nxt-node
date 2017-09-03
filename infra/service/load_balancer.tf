@@ -20,12 +20,6 @@ module "load_balancer" {
       instance_protocol = "TCP"
     },
     {
-      lb_port = "${var.ui_server_port}"
-      lb_protocol = "HTTP"
-      instance_port = "${var.ui_server_port}"
-      instance_protocol = "HTTP"
-    },
-    {
       lb_port = "${var.api_server_port}"
       lb_protocol = "HTTP"
       instance_port = "${var.api_server_port}"
@@ -36,11 +30,6 @@ module "load_balancer" {
     {
       lb_port = "${var.peer_server_port}"
       instance_port = "${var.peer_server_port}"
-      allow_cidr = "0.0.0.0/0"
-    },
-    {
-      lb_port = "${var.ui_server_port}"
-      instance_port = "${var.ui_server_port}"
       allow_cidr = "0.0.0.0/0"
     },
     {
