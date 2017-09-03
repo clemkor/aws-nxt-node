@@ -20,7 +20,7 @@ module "load_balancer" {
       instance_protocol = "TCP"
     },
     {
-      lb_port = 80
+      lb_port = "${var.api_server_port}"
       lb_protocol = "HTTP"
       instance_port = "${var.api_server_port}"
       instance_protocol = "HTTP"
