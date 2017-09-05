@@ -1,4 +1,5 @@
 require 'ruby_terraform'
+require 'fileutils'
 
 module TerraformOutput
   def self.for(opts)
@@ -10,13 +11,11 @@ module TerraformOutput
 
     configuration_directory = File.join(work_directory, source_directory)
 
-    RubyTerraform.clean(
-        directory: configuration_directory)
-    RubyTerraform.init(
-        source: source_directory,
-        path: configuration_directory,
-        backend_config: backend_config)
+    FileUtils.mkdir_p File.dirname(configuration_directory)
+    FileUtils.cp_r source_directory, configuration_directory
+
     Dir.chdir(configuration_directory) do
+      RubyTerraform.init(backend_config: backend_config)
       RubyTerraform.output(name: name)
     end
   end
