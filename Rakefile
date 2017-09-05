@@ -11,7 +11,7 @@ require 'terraform_output'
 
 RakeTerraform.define_installation_tasks(
     path: File.join(Dir.pwd, 'vendor', 'terraform'),
-    version: '0.9.8')
+    version: '0.10.3')
 
 configuration = Configuration.new
 version = S3VersionFile.new(
