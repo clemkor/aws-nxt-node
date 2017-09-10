@@ -8,7 +8,6 @@ variable "version_number" {}
 variable "admin_password" {}
 
 variable "peer_server_port" {}
-variable "ui_server_port" {}
 variable "api_server_port" {}
 
 variable "desired_count" {}

@@ -14,7 +14,6 @@ data "template_file" "task_container_definitions" {
     aws_s3_configuration_object = "${data.template_file.env_url.rendered}"
 
     peer_server_port = "${var.peer_server_port}"
-    ui_server_port = "${var.ui_server_port}"
     api_server_port = "${var.api_server_port}"
   }
 }

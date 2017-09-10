@@ -13,10 +13,6 @@
       {
         "containerPort": ${api_server_port},
         "hostPort": ${api_server_port}
-      },
-      {
-        "containerPort": ${ui_server_port},
-        "hostPort": ${ui_server_port}
       }
     ],
     "environment": [

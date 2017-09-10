@@ -10,7 +10,6 @@ vars:
   admin_password: "%{hiera('admin_password')}"
 
   peer_server_port: 7874
-  ui_server_port: 7875
   api_server_port: 7876
 
   desired_count: 1
