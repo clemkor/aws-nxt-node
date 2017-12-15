@@ -23,12 +23,62 @@ version = S3VersionFile.new(
 task :default => [
     :'image_repository:plan',
     :'secrets_bucket:plan',
+    :'blockchain_archive_lambda:plan',
     :'service:plan'
 ]
 
 namespace :version do
   task :bump do
     version.bump(:revision)
+  end
+end
+
+namespace :virtualenv do
+  task :create do
+    mkdir_p 'vendor'
+    sh 'virtualenv vendor/virtualenv --always-copy'
+  end
+
+  task :destroy do
+    rm_rf 'vendor/virtualenv'
+  end
+
+  task :ensure do
+    unless File.exists?('vendor/virtualenv')
+      Rake::Task['virtualenv:create'].invoke
+    end
+  end
+end
+
+namespace :dependencies do
+  namespace :install do
+    task :blockchain_archive_lambda => ['virtualenv:ensure'] do
+      puts 'Installing dependencies for blockchain_archive lambda'
+
+      sh_in_virtualenv(
+          'pip', 'install -r ' +
+              'infra/blockchain_archive_lambda/' +
+              'lambda_definitions/blockchain_archive/requirements.txt')
+    end
+
+    task :all => ['dependencies:install:blockchain_archive_lambda']
+  end
+end
+
+namespace :test do
+  namespace :unit do
+    task :blockchain_archive_lambda => [
+        'dependencies:install:blockchain_archive_lambda'
+    ] do
+      puts 'Running unit tests for blockchain_archive lambda'
+
+      sh_in_virtualenv(
+          'python', '-m unittest discover -s ' +
+              'infra/blockchain_archive_lambda/' +
+              'lambda_definitions/blockchain_archive')
+    end
+
+    task :all => ['test:unit:blockchain_archive_lambda']
   end
 end
 
@@ -128,6 +178,45 @@ namespace :secrets_bucket do
   end
 end
 
+namespace :blockchain_archive_lambda do
+  task :prepare => [
+      'terraform:ensure',
+      'dependencies:install:blockchain_archive_lambda'
+  ] do
+    rm_rf('build/lambda_definitions/blockchain_archive')
+    mkdir_p('build/lambda_definitions/blockchain_archive')
+    cp_r(
+        'infra/blockchain_archive_lambda/lambda_definitions/blockchain_archive/.',
+        'build/lambda_definitions/blockchain_archive')
+    cp_r(
+        'vendor/virtualenv/lib/python3.6/site-packages/.',
+        'build/lambda_definitions/blockchain_archive')
+  end
+
+  RakeTerraform.define_command_tasks do |t|
+    t.argument_names = [:deployment_identifier]
+    t.ensure_task = 'blockchain_archive_lambda:prepare'
+
+    t.configuration_name = 'blockchain archive lambda'
+    t.source_directory = 'infra/blockchain_archive_lambda'
+    t.work_directory = 'build'
+
+    t.backend_config = lambda do |args|
+      configuration
+          .for_overrides(args)
+          .for_scope(role: 'blockchain-archive-lambda')
+          .backend_config
+    end
+
+    t.vars = lambda do |args|
+      configuration
+          .for_overrides(args)
+          .for_scope(role: 'blockchain-archive-lambda')
+          .vars
+    end
+  end
+end
+
 namespace :service do
   RakeTerraform.define_command_tasks do |t|
     t.argument_names = [:deployment_identifier]
@@ -161,4 +250,9 @@ namespace :service do
           .vars
     end
   end
+end
+
+def sh_in_virtualenv command, argument_string
+  sh "#{File.expand_path('vendor/virtualenv/bin')}/#{command} " +
+         "#{argument_string}"
 end

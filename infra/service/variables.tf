@@ -10,6 +10,8 @@ variable "admin_password" {}
 variable "peer_server_port" {}
 variable "api_server_port" {}
 
+variable "initial_blockchain_archive_path" {}
+
 variable "desired_count" {}
 variable "deployment_maximum_percent" {}
 variable "deployment_minimum_healthy_percent" {}

@@ -2,6 +2,7 @@ data "template_file" "env" {
   template = "${file("${path.root}/envfiles/nxt-node.env.tpl")}"
 
   vars {
+    initial_blockchain_archive_path = "${var.initial_blockchain_archive_path}"
     admin_password = "${var.admin_password}"
   }
 }

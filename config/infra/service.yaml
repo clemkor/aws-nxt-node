@@ -22,6 +22,7 @@ vars:
   cluster_state_key: "%{hiera('cluster_state_key')}"
   image_repository_state_key: "%{hiera('image_repository_state_key')}"
   secrets_bucket_state_key: "%{hiera('secrets_bucket_state_key')}"
+
 backend_config:
   bucket: "%{hiera('components_bucket_name')}"
   key: "%{hiera('service_state_key')}"
