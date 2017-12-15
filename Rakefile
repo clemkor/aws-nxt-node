@@ -4,16 +4,16 @@ require 'yaml'
 
 require 'rake_terraform'
 require 'rake_docker'
+require 'confidante'
 
-require 'configuration'
 require 's3_version_file'
 require 'terraform_output'
 
 RakeTerraform.define_installation_tasks(
     path: File.join(Dir.pwd, 'vendor', 'terraform'),
-    version: '0.10.3')
+    version: '0.10.8')
 
-configuration = Configuration.new
+configuration = Confidante.configuration
 version = S3VersionFile.new(
     configuration.region,
     configuration.components_bucket_name,
@@ -114,14 +114,14 @@ namespace :secrets_bucket do
 
     t.backend_config = lambda do |args|
       configuration
-          .for_args(args)
+          .for_overrides(args)
           .for_scope(role: 'secrets-bucket')
           .backend_config
     end
 
     t.vars = lambda do |args|
       configuration
-          .for_args(args)
+          .for_overrides(args)
           .for_scope(role: 'secrets-bucket')
           .vars
     end
@@ -138,7 +138,7 @@ namespace :service do
 
     t.backend_config = lambda do |args|
       configuration
-          .for_args(args)
+          .for_overrides(args)
           .for_scope(role: 'service')
           .backend_config
     end
@@ -146,7 +146,7 @@ namespace :service do
     t.vars = lambda do |args|
       deployment_identifier =
           configuration
-              .for_args(args)
+              .for_overrides(args)
               .for_scope(role: 'service')
               .deployment_identifier
 
@@ -154,7 +154,7 @@ namespace :service do
           'config/secrets/nxt/%s.yaml' % deployment_identifier)
 
       configuration
-          .for_args(args.to_hash.merge(
+          .for_overrides(args.to_hash.merge(
               'version_number' => version.refresh.to_s,
               'admin_password' => nxt_node_config['admin_password']))
           .for_scope(role: 'service')

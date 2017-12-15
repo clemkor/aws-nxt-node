@@ -3,7 +3,6 @@ components_bucket_name: "eth-quest-components"
 
 region: "eu-west-2"
 
-deployment_identifier: "dev"
 component: "nxt-node"
 
 common_state_key: "environment/deployment-state/common/default.tfstate"

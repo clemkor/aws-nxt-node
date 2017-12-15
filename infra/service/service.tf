@@ -19,7 +19,7 @@ data "template_file" "task_container_definitions" {
 }
 
 module "service" {
-  source = "github.com/infrablocks/terraform-aws-ecs-service?ref=0.1.3//src"
+  source = "github.com/infrablocks/terraform-aws-ecs-service?ref=0.1.8//src"
 
   region = "${var.region}"
   vpc_id = "${data.terraform_remote_state.network.vpc_id}"
