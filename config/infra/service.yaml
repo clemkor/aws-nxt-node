@@ -12,6 +12,8 @@ vars:
   peer_server_port: 7874
   api_server_port: 7876
 
+  initial_blockchain_archive_path: "s3://%{hiera('blockchain_archive_bucket_name')}/%{hiera('blockchain_archive_key')}"
+
   desired_count: 1
   deployment_maximum_percent: 100
   deployment_minimum_healthy_percent: 0

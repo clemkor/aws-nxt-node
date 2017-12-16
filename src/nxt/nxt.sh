@@ -16,20 +16,27 @@ if [ -z "$AWS_S3_CONFIGURATION_OBJECT" ]; then
 fi
 
 # Source default env file
+echo "Sourcing default NXT configuration."
 eval $(cat /opt/nxt/conf/nxt-default.env | sed 's/^/export /')
 
 # Fetch and source overrides env file
+echo "Fetching and sourcing override NXT configuration."
 eval $(aws s3 cp --sse AES256 --region ${AWS_REGION} \
     ${AWS_S3_CONFIGURATION_OBJECT} - | sed 's/^/export /')
 
 # Fetch initial database archive if specified
-if [ -n "$NXT_INITIAL_BLOCKCHAIN_ARCHIVE_URL" ]; then
-    curl -sSL "$NXT_INITIAL_BLOCKCHAIN_ARCHIVE_URL" -o /tmp/blockchain_archive.zip
-    unzip /tmp/blockchain_archive.zip -d /opt/nxt
+if [ -n "$NXT_INITIAL_BLOCKCHAIN_ARCHIVE_PATH" ]; then
+    echo "Fetching initial blockchain archive from ${NXT_INITIAL_BLOCKCHAIN_ARCHIVE_PATH}."
+    aws s3 cp --sse AES256 --region ${AWS_REGION} \
+        ${NXT_INITIAL_BLOCKCHAIN_ARCHIVE_PATH} \
+        /tmp/blockchain_archive.zip
+    unzip /tmp/blockchain_archive.zip -d /opt/nxt/nxt_db
     rm /tmp/blockchain_archive.zip
+    echo "Fetched initial blockchain archive."
 fi
 
 # Render properties template
+echo "Rendering NXT properties file."
 cat /opt/nxt/conf/nxt.properties.template \
     | envsubst > /opt/nxt/conf/nxt.properties
 
@@ -37,4 +44,5 @@ cat /opt/nxt/conf/nxt.properties.template \
 cd /opt/nxt
 
 # Start NXT
+echo "Starting NXT."
 ./run.sh

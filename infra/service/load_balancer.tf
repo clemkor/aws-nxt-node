@@ -1,52 +1,108 @@
-module "load_balancer" {
-  source = "github.com/infrablocks/terraform-aws-classic-load-balancer?ref=0.1.3//src"
+resource "aws_route53_record" "public" {
+  zone_id = "${data.terraform_remote_state.common.public_dns_zone_id}"
+  name = "${var.component}-${var.deployment_identifier}.${data.terraform_remote_state.common.domain_name}"
+  type = "A"
 
-  region = "${var.region}"
+  alias {
+    name = "${aws_elb.load_balancer.dns_name}"
+    zone_id = "${aws_elb.load_balancer.zone_id}"
+    evaluate_target_health = false
+  }
+}
+
+resource "aws_route53_record" "private" {
+  zone_id = "${data.terraform_remote_state.common.private_dns_zone_id}"
+  name = "${var.component}-${var.deployment_identifier}.${data.terraform_remote_state.common.domain_name}"
+  type = "A"
+
+  alias {
+    name = "${aws_elb.load_balancer.dns_name}"
+    zone_id = "${aws_elb.load_balancer.zone_id}"
+    evaluate_target_health = false
+  }
+}
+
+resource "aws_security_group" "load_balancer" {
+  name = "elb-${var.component}-${var.deployment_identifier}"
+  description = "ELB for component: ${var.component}, deployment: ${var.deployment_identifier}"
   vpc_id = "${data.terraform_remote_state.network.vpc_id}"
-  subnet_ids = "${split(",", data.terraform_remote_state.network.public_subnet_ids)}"
+}
 
-  domain_name = "${data.terraform_remote_state.common.domain_name}"
-  public_zone_id = "${data.terraform_remote_state.common.public_dns_zone_id}"
-  private_zone_id = "${data.terraform_remote_state.common.private_dns_zone_id}"
+resource "aws_security_group_rule" "elb_egress" {
+  type = "egress"
 
-  component = "${var.component}"
-  deployment_identifier = "${var.deployment_identifier}"
-
-  listeners = [
-    {
-      lb_port = "${var.peer_server_port}"
-      lb_protocol = "TCP"
-      instance_port = "${var.peer_server_port}"
-      instance_protocol = "TCP"
-    },
-    {
-      lb_port = "${var.api_server_port}"
-      lb_protocol = "HTTP"
-      instance_port = "${var.api_server_port}"
-      instance_protocol = "HTTP"
-    }
-  ]
-  access_control = [
-    {
-      lb_port = "${var.peer_server_port}"
-      instance_port = "${var.peer_server_port}"
-      allow_cidr = "0.0.0.0/0"
-    },
-    {
-      lb_port = 443
-      instance_port = "${var.api_server_port}"
-      allow_cidr = "0.0.0.0/0"
-    }
+  from_port = 1
+  to_port = 65535
+  protocol = "tcp"
+  cidr_blocks = [
+    "${data.aws_vpc.network.cidr_block}"
   ]
 
-  health_check_target = "TCP:${var.peer_server_port}"
-  health_check_timeout = 30
-  health_check_interval = 60
-  health_check_unhealthy_threshold = 10
-  health_check_healthy_threshold = 10
+  security_group_id = "${aws_security_group.load_balancer.id}"
+}
 
-  include_public_dns_record = "yes"
-  include_private_dns_record = "yes"
+resource "aws_security_group_rule" "elb_peer_server_ingress" {
+  type = "ingress"
 
-  expose_to_public_internet = "yes"
+  from_port = "${var.peer_server_port}"
+  to_port = "${var.peer_server_port}"
+  protocol = "TCP"
+  cidr_blocks = [
+    "0.0.0.0/0"
+  ]
+
+  security_group_id = "${aws_security_group.load_balancer.id}"
+}
+
+resource "aws_security_group_rule" "api_peer_server_ingress" {
+  type = "ingress"
+
+  from_port = "${var.api_server_port}"
+  to_port = "${var.api_server_port}"
+  protocol = "TCP"
+  cidr_blocks = [
+    "0.0.0.0/0"
+  ]
+
+  security_group_id = "${aws_security_group.load_balancer.id}"
+}
+
+resource "aws_elb" "load_balancer" {
+  subnets = [
+    "${split(",", data.terraform_remote_state.network.public_subnet_ids)}"
+  ]
+  security_groups = [
+    "${aws_security_group.load_balancer.id}"
+  ]
+
+  internal = false
+
+
+  listener {
+    instance_port = "${var.peer_server_port}"
+    instance_protocol = "TCP"
+    lb_port = "${var.peer_server_port}"
+    lb_protocol = "TCP"
+  }
+
+  listener {
+    instance_port = "${var.api_server_port}"
+    instance_protocol = "HTTP"
+    lb_port = "${var.api_server_port}"
+    lb_protocol = "HTTP"
+  }
+
+  health_check {
+    target = "TCP:${var.peer_server_port}"
+    timeout = 30
+    interval = 60
+    unhealthy_threshold = 10
+    healthy_threshold = 10
+  }
+
+  tags {
+    Name = "elb-${var.component}-${var.deployment_identifier}"
+    Component = "${var.component}"
+    DeploymentIdentifier = "${var.deployment_identifier}"
+  }
 }

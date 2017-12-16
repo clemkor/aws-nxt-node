@@ -37,7 +37,7 @@ module "service" {
   service_deployment_maximum_percent = "${var.deployment_maximum_percent}"
   service_deployment_minimum_healthy_percent = "${var.deployment_minimum_healthy_percent}"
 
-  service_elb_name = "${module.load_balancer.name}"
+  service_elb_name = "${aws_elb.load_balancer.id}"
 
   ecs_cluster_id = "${data.terraform_remote_state.cluster.cluster_id}"
   ecs_cluster_service_role_arn = "${data.terraform_remote_state.cluster.service_role_arn}"
