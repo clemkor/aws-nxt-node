@@ -41,6 +41,7 @@ class S3VersionFile
 
   def get_remote_file
     begin
+      FileUtils.mkdir_p(File.dirname(@local_path))
       @client.get_object(
           response_target: @local_path,
           bucket: @bucket,

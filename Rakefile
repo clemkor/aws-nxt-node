@@ -21,7 +21,8 @@ version = S3VersionFile.new(
     'build/version')
 
 task :default => [
-    :'image_repository:plan',
+    :'nxt_image_repository:plan',
+    :'cert_manager_image_repository:plan',
     :'secrets_bucket:plan',
     :'blockchain_archive_lambda:plan',
     :'service:plan'
@@ -82,75 +83,154 @@ namespace :test do
   end
 end
 
-namespace :image_repository do
-  RakeTerraform.define_command_tasks do |t|
-    t.configuration_name = 'image repository'
-    t.source_directory = 'infra/image_repository'
-    t.work_directory = 'build'
+namespace :nxt do
+  namespace :image_repository do
+    RakeTerraform.define_command_tasks do |t|
+      t.configuration_name = 'NXT image repository'
+      t.source_directory = 'infra/image_repository'
+      t.work_directory = 'build'
 
-    t.backend_config = lambda do
-      configuration
-          .for_scope(role: 'image-repository')
-          .backend_config
-    end
+      t.backend_config = lambda do
+        configuration
+            .for_scope(role: 'nxt-image-repository')
+            .backend_config
+      end
 
-    t.vars = lambda do
-      configuration
-          .for_scope(role: 'image-repository')
-          .vars
+      t.vars = lambda do
+        configuration
+            .for_scope(role: 'nxt-image-repository')
+            .vars
+      end
     end
   end
-end
 
-namespace :image do
-  RakeDocker.define_image_tasks do |t|
-    t.image_name = 'aws-nxt'
-    t.work_directory = 'build/images'
+  namespace :image do
+    RakeDocker.define_image_tasks do |t|
+      t.image_name = 'aws-nxt'
+      t.work_directory = 'build/images'
 
-    t.copy_spec = [
-        {from: 'src/nxt/Dockerfile', to: 'Dockerfile'},
-        {from: 'src/nxt/nxt.sh', to: 'nxt.sh'},
-        {from: 'src/nxt/nxt.properties.template',
-         to: 'nxt.properties.template'},
-        {from: 'src/nxt/nxt-default.env', to: 'nxt-default.env'}
-    ]
+      t.copy_spec = [
+          {from: 'src/nxt/Dockerfile', to: 'Dockerfile'},
+          {from: 'src/nxt/nxt.sh', to: 'nxt.sh'},
+          {from: 'src/nxt/nxt.properties.template',
+           to: 'nxt.properties.template'},
+          {from: 'src/nxt/nxt-default.env', to: 'nxt-default.env'}
+      ]
 
-    t.repository_name = 'eth-quest/aws-nxt'
-    t.repository_url = lambda do
-      TerraformOutput.for(
-          name: 'repository_url',
-          source_directory: 'infra/image_repository',
-          work_directory: 'build',
-          backend_config:
-              configuration
-                  .for_scope(role: 'image-repository')
-                  .backend_config)
-    end
-    t.credentials = RakeDocker::Authentication::ECR.new do |c|
-      c.region = configuration.region
-      c.registry_id = lambda do
+      t.repository_name = 'eth-quest/aws-nxt'
+      t.repository_url = lambda do
         TerraformOutput.for(
-            name: 'registry_id',
+            name: 'repository_url',
             source_directory: 'infra/image_repository',
             work_directory: 'build',
             backend_config:
                 configuration
-                    .for_scope(role: 'image-repository')
+                    .for_scope(role: 'nxt-image-repository')
                     .backend_config)
+      end
+      t.credentials = RakeDocker::Authentication::ECR.new do |c|
+        c.region = configuration.region
+        c.registry_id = lambda do
+          TerraformOutput.for(
+              name: 'registry_id',
+              source_directory: 'infra/image_repository',
+              work_directory: 'build',
+              backend_config:
+                  configuration
+                      .for_scope(role: 'nxt-image-repository')
+                      .backend_config)
+        end
+      end
+
+      t.tags = lambda do
+        [version.refresh.to_s, 'latest']
       end
     end
 
-    t.tags = lambda do
-      [version.refresh.to_s, 'latest']
+    task :publish => [
+        'nxt:image:clean',
+        'nxt:image:build',
+        'nxt:image:tag',
+        'nxt:image:push'
+    ]
+  end
+end
+
+namespace :cert_manager do
+  namespace :image_repository do
+    RakeTerraform.define_command_tasks do |t|
+      t.configuration_name = 'cert manager image repository'
+      t.source_directory = 'infra/image_repository'
+      t.work_directory = 'build'
+
+      t.backend_config = lambda do
+        configuration
+            .for_scope(role: 'cert-manager-image-repository')
+            .backend_config
+      end
+
+      t.vars = lambda do
+        configuration
+            .for_scope(role: 'cert-manager-image-repository')
+            .vars
+      end
     end
   end
 
+  namespace :image do
+    RakeDocker.define_image_tasks do |t|
+      t.image_name = 'aws-cert-manager'
+      t.work_directory = 'build/images'
+
+      t.copy_spec = [
+          {from: 'src/cert-manager/Dockerfile', to: 'Dockerfile'},
+          {from: 'src/cert-manager/cert-manager.sh', to: 'cert-manager.sh'},
+      ]
+
+      t.repository_name = 'eth-quest/aws-cert-manager'
+      t.repository_url = lambda do
+        TerraformOutput.for(
+            name: 'repository_url',
+            source_directory: 'infra/image_repository',
+            work_directory: 'build',
+            backend_config:
+                configuration
+                    .for_scope(role: 'cert-manager-image-repository')
+                    .backend_config)
+      end
+      t.credentials = RakeDocker::Authentication::ECR.new do |c|
+        c.region = configuration.region
+        c.registry_id = lambda do
+          TerraformOutput.for(
+              name: 'registry_id',
+              source_directory: 'infra/image_repository',
+              work_directory: 'build',
+              backend_config:
+                  configuration
+                      .for_scope(role: 'cert-manager-image-repository')
+                      .backend_config)
+        end
+      end
+
+      t.tags = lambda do
+        [version.refresh.to_s, 'latest']
+      end
+    end
+
+    task :publish => [
+        'cert_manager:image:clean',
+        'cert_manager:image:build',
+        'cert_manager:image:tag',
+        'cert_manager:image:push'
+    ]
+  end
+end
+
+namespace :images do
   task :publish => [
       'version:bump',
-      'image:clean',
-      'image:build',
-      'image:tag',
-      'image:push'
+      'nxt:image:publish',
+      'cert_manager:image:publish'
   ]
 end
 

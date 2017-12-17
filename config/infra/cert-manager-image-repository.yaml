@@ -2,7 +2,9 @@
 vars:
   region: "%{hiera('region')}"
 
+  image_name: 'aws-cert-manager'
+
 backend_config:
   bucket: "%{hiera('components_bucket_name')}"
-  key: "%{hiera('image_repository_state_key')}"
+  key: "%{hiera('cert_manager_image_repository_state_key')}"
   region: "%{hiera('region')}"

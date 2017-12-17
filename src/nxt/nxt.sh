@@ -24,15 +24,17 @@ echo "Fetching and sourcing override NXT configuration."
 eval $(aws s3 cp --sse AES256 --region ${AWS_REGION} \
     ${AWS_S3_CONFIGURATION_OBJECT} - | sed 's/^/export /')
 
-# Fetch initial database archive if specified
+# Fetch initial database archive if specified and not already present
 if [ -n "$NXT_INITIAL_BLOCKCHAIN_ARCHIVE_PATH" ]; then
-    echo "Fetching initial blockchain archive from ${NXT_INITIAL_BLOCKCHAIN_ARCHIVE_PATH}."
-    aws s3 cp --sse AES256 --region ${AWS_REGION} \
-        ${NXT_INITIAL_BLOCKCHAIN_ARCHIVE_PATH} \
-        /tmp/blockchain_archive.zip
-    unzip /tmp/blockchain_archive.zip -d /opt/nxt/nxt_db
-    rm /tmp/blockchain_archive.zip
-    echo "Fetched initial blockchain archive."
+    if [ ! -f "/opt/nxt/nxt_db/nxt.h2.db" ]; then
+        echo "Fetching initial blockchain archive from ${NXT_INITIAL_BLOCKCHAIN_ARCHIVE_PATH}."
+        aws s3 cp --sse AES256 --region ${AWS_REGION} \
+            ${NXT_INITIAL_BLOCKCHAIN_ARCHIVE_PATH} \
+            /tmp/blockchain_archive.zip
+        unzip /tmp/blockchain_archive.zip -d /opt/nxt/nxt_db
+        rm /tmp/blockchain_archive.zip
+        echo "Fetched initial blockchain archive."
+    fi
 fi
 
 # Render properties template

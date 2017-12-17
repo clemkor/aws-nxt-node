@@ -39,6 +39,17 @@ module "service" {
 
   service_elb_name = "${aws_elb.load_balancer.id}"
 
+  service_volumes = [
+    {
+      name = "nxt-data"
+      host_path = "/opt/nxt/nxt_db"
+    },
+    {
+      name = "nxt-certs"
+      host_path = "/opt/nxt/nxt_certs"
+    }
+  ]
+
   ecs_cluster_id = "${data.terraform_remote_state.cluster.cluster_id}"
   ecs_cluster_service_role_arn = "${data.terraform_remote_state.cluster.service_role_arn}"
 }
