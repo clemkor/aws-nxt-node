@@ -2,10 +2,17 @@ require 'version'
 require 'aws-sdk'
 
 class S3VersionFile
-  def initialize(region, bucket, key, local_path, initial_version = '0.1.0')
+  def initialize(
+      region,
+      bucket,
+      key,
+      local_path,
+      server_side_encryption = 'AES256',
+      initial_version = '0.1.0')
     @bucket = bucket
     @key = key
     @local_path = local_path
+    @server_side_encryption = server_side_encryption
     @initial_version = initial_version
 
     @client = Aws::S3::Client.new(region: region)
@@ -41,6 +48,7 @@ class S3VersionFile
 
   def get_remote_file
     begin
+      puts 'Getting remote'
       FileUtils.mkdir_p(File.dirname(@local_path))
       @client.get_object(
           response_target: @local_path,
@@ -53,17 +61,21 @@ class S3VersionFile
   end
 
   def put_remote_file(version)
+    puts 'Putting remote'
     @client.put_object(
         body: version,
         bucket: @bucket,
-        key: @key,)
+        key: @key,
+        server_side_encryption: @server_side_encryption)
   end
 
   def read_local_file
+    puts 'Reading local'
     File.read(@local_path)
   end
 
   def write_local_file(version)
+    puts 'Writing local'
     File.open(@local_path, 'w') { |f| f.write(version) }
   end
 end

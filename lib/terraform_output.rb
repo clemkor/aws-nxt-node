@@ -11,6 +11,7 @@ module TerraformOutput
 
     configuration_directory = File.join(work_directory, source_directory)
 
+    FileUtils.rm_rf File.dirname(configuration_directory)
     FileUtils.mkdir_p File.dirname(configuration_directory)
     FileUtils.cp_r source_directory, configuration_directory
 

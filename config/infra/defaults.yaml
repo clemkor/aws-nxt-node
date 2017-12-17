@@ -1,25 +1,36 @@
 ---
-components_bucket_name: "eth-quest-components"
-
-region: "eu-west-2"
+region: "eu-west-1"
 
 component: "nxt-node"
 
-common_state_key: "environment/deployment-state/common/default.tfstate"
-network_state_key: "environment/deployment-state/network/%{hiera('deployment_identifier')}.tfstate"
-cluster_state_key: "environment/deployment-state/cluster/%{hiera('deployment_identifier')}.tfstate"
+shared_storage_bucket_name: "eth-quest-%{hiera('component')}-storage-%{hiera('shared_deployment_identifier')}"
+specific_storage_bucket_name: "eth-quest-%{hiera('component')}-storage-%{hiera('specific_deployment_identifier')}"
 
-image_version_key: "nxt-node/metadata/version"
-
-secrets_bucket_name: "eth-quest-nxt-node-secrets-%{hiera('deployment_identifier')}"
+image_version_key: "metadata/version"
 
 blockchain_archive_url: "https://ardor.tools/nxt.h2.db.1438599.zip"
-blockchain_archive_bucket_name: "eth-quest-nxt-node-data-%{hiera('deployment_identifier')}"
+blockchain_archive_bucket_name: "eth-quest-nxt-node-data-%{hiera('specific_deployment_identifier')}"
 blockchain_archive_key: "nxt-node/blockchain-archive/nxt-db.zip"
 blockchain_archive_chunk_size_bytes: 10485760
 
-nxt_image_repository_state_key: "nxt-node/deployment-state/nxt-image-repository/default.tfstate"
-cert_manager_image_repository_state_key: "nxt-node/deployment-state/cert-manager-image-repository/default.tfstate"
-secrets_bucket_state_key: "nxt-node/deployment-state/secrets-bucket/%{hiera('deployment_identifier')}.tfstate"
-blockchain_archive_lambda_state_key: "nxt-node/deployment-state/blockchain-archive-lambda/%{hiera('deployment_identifier')}.tfstate"
-service_state_key: "nxt-node/deployment-state/service/%{hiera('deployment_identifier')}.tfstate"
+common_state_bucket_name: "eth-quest-global-storage-default"
+common_state_key: "deployment-state/common/default.tfstate"
+
+network_state_bucket_name: "eth-quest-environment-storage-%{hiera('environment_deployment_identifier')}"
+network_state_key: "deployment-state/network/default.tfstate"
+
+cluster_state_bucket_name: "eth-quest-environment-storage-%{hiera('environment_deployment_identifier')}"
+cluster_state_key: "deployment-state/cluster/default.tfstate"
+
+nxt_image_repository_state_bucket_name: "%{hiera('shared_storage_bucket_name')}"
+nxt_image_repository_state_key: "deployment-state/nxt-image-repository/default.tfstate"
+
+cert_manager_image_repository_state_bucket_name: "%{hiera('shared_storage_bucket_name')}"
+cert_manager_image_repository_state_key: "deployment-state/cert-manager-image-repository/default.tfstate"
+
+blockchain_archive_lambda_state_bucket_name: "%{hiera('specific_storage_bucket_name')}"
+blockchain_archive_lambda_state_key: "deployment-state/blockchain-archive-lambda/default.tfstate"
+
+nxt_service_state_bucket_name: "%{hiera('specific_storage_bucket_name')}"
+nxt_service_state_key: "deployment-state/nxt-service/default.tfstate"
+

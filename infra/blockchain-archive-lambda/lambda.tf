@@ -1,7 +1,7 @@
 data "archive_file" "blockchain_archive_lambda_contents" {
   type = "zip"
-  source_dir = "${path.module}/../../lambda_definitions/blockchain_archive"
-  output_path = "${path.cwd}/build/blockchain_archive.zip"
+  source_dir = "${path.module}/../../lambda-definitions/blockchain-archive"
+  output_path = "${path.cwd}/build/blockchain-archive.zip"
 }
 
 resource "aws_lambda_function" "blockchain_archive" {

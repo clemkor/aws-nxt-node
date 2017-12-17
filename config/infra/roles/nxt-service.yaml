@@ -3,7 +3,7 @@ vars:
   region: "%{hiera('region')}"
 
   component: "%{hiera('component')}"
-  deployment_identifier: "%{hiera('deployment_identifier')}"
+  deployment_identifier: "%{hiera('specific_deployment_identifier')}"
 
   version_number: "%{hiera('version_number')}"
 
@@ -18,14 +18,22 @@ vars:
   deployment_maximum_percent: 100
   deployment_minimum_healthy_percent: 0
 
-  state_bucket: "%{hiera('components_bucket_name')}"
+  secrets_bucket_name: "%{hiera('specific_storage_bucket_name')}"
+
+  common_state_bucket_name: "%{hiera('common_state_bucket_name')}"
   common_state_key: "%{hiera('common_state_key')}"
+
+  network_state_bucket_name: "%{hiera('network_state_bucket_name')}"
   network_state_key: "%{hiera('network_state_key')}"
+
+  cluster_state_bucket_name: "%{hiera('cluster_state_bucket_name')}"
   cluster_state_key: "%{hiera('cluster_state_key')}"
-  image_repository_state_key: "%{hiera('image_repository_state_key')}"
-  secrets_bucket_state_key: "%{hiera('secrets_bucket_state_key')}"
+
+  image_repository_state_bucket_name: "%{hiera('nxt_image_repository_state_bucket_name')}"
+  image_repository_state_key: "%{hiera('nxt_image_repository_state_key')}"
 
 backend_config:
-  bucket: "%{hiera('components_bucket_name')}"
-  key: "%{hiera('service_state_key')}"
+  bucket: "%{hiera('nxt_service_state_bucket_name')}"
+  key: "%{hiera('nxt_service_state_key')}"
   region: "%{hiera('region')}"
+  encrypt: "true"

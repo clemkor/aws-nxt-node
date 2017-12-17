@@ -5,6 +5,7 @@ vars:
   image_name: 'aws-nxt'
 
 backend_config:
-  bucket: "%{hiera('components_bucket_name')}"
+  bucket: "%{hiera('nxt_image_repository_state_bucket_name')}"
   key: "%{hiera('nxt_image_repository_state_key')}"
   region: "%{hiera('region')}"
+  encrypt: "true"
