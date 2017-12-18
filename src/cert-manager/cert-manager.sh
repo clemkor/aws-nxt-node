@@ -18,3 +18,13 @@ certbot certonly \
     --preferred-challenges dns \
     --domain ${CERT_MANAGER_DOMAIN} \
     --email ${CERT_MANAGER_EMAIL}
+
+echo "Converting to PKCS12 keystore..."
+openssl pkcs12 \
+    -export \
+    -inkey /opt/cert-manager/certs/live/${CERT_MANAGER_DOMAIN}/privkey.pem \
+    -in /opt/cert-manager/certs/live/${CERT_MANAGER_DOMAIN}/fullchain.pem \
+    -out /opt/cert-manager/certs/live/${CERT_MANAGER_DOMAIN}/keystore.pkcs12 \
+    -password pass:${CERT_MANAGER_KEY_STORE_PASSWORD}
+    
+echo "Done."
