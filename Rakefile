@@ -357,10 +357,7 @@ namespace :cert_manager do
       t.image_name = 'aws-cert-manager'
       t.work_directory = 'build/images'
 
-      t.copy_spec = [
-          {from: 'src/cert-manager/Dockerfile', to: 'Dockerfile'},
-          {from: 'src/cert-manager/cert-manager.sh', to: 'cert-manager.sh'},
-      ]
+      t.copy_spec = t.copy_spec = ['src/cert-manager/.']
 
       t.repository_name = 'eth-quest/aws-cert-manager'
       t.repository_url = lambda do
