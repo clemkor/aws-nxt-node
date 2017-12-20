@@ -34,3 +34,6 @@ blockchain_archive_lambda_state_key: "deployment-state/blockchain-archive-lambda
 nxt_service_state_bucket_name: "%{hiera('specific_storage_bucket_name')}"
 nxt_service_state_key: "deployment-state/nxt-service/default.tfstate"
 
+cert_manager_task_state_bucket_name: "%{hiera('specific_storage_bucket_name')}"
+cert_manager_task_state_key: "deployment-state/cert_manager-task/default.tfstate"
+

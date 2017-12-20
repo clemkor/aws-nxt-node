@@ -1,5 +1,5 @@
 data "template_file" "env" {
-  template = "${file("${path.root}/envfiles/nxt-node.env.tpl")}"
+  template = "${file("${path.root}/envfiles/nxt.env.tpl")}"
 
   vars {
     initial_blockchain_archive_path = "${var.initial_blockchain_archive_path}"

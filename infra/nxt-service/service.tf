@@ -8,7 +8,7 @@ data "template_file" "image" {
 }
 
 data "template_file" "task_container_definitions" {
-  template = "${file("${path.root}/container-definitions/nxt-node.json.tpl")}"
+  template = "${file("${path.root}/container-definitions/nxt.json.tpl")}"
 
   vars {
     aws_s3_configuration_object = "${data.template_file.env_url.rendered}"
@@ -19,7 +19,7 @@ data "template_file" "task_container_definitions" {
 }
 
 module "service" {
-  source = "github.com/infrablocks/terraform-aws-ecs-service?ref=0.1.8//src"
+  source = "github.com/infrablocks/terraform-aws-ecs-service?ref=0.1.9//src"
 
   region = "${var.region}"
   vpc_id = "${data.terraform_remote_state.network.vpc_id}"
@@ -27,7 +27,7 @@ module "service" {
   component = "${var.component}"
   deployment_identifier = "${var.deployment_identifier}"
 
-  service_name = "${var.component}"
+  service_name = "${var.service_name}"
   service_image = "${data.template_file.image.rendered}"
   service_port = "${var.peer_server_port}"
 

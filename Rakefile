@@ -29,13 +29,12 @@ task :default => [
     :'blockchain_archive_lambda:plan',
     :'nxt:image_repository:plan',
     :'cert_manager:image_repository:plan',
-    :'nxt:service:plan'
+    :'nxt:service:plan',
+    :'cert_manager:task:plan'
 ]
 
 namespace :version do
   task :bump do
-    puts version.inspect
-
     version.bump(:revision)
   end
 end
@@ -413,6 +412,54 @@ namespace :cert_manager do
         'cert_manager:image:tag',
         'cert_manager:image:push'
     ]
+  end
+
+  namespace :task do
+    RakeTerraform.define_command_tasks do |t|
+      t.argument_names = [
+          :specific_deployment_identifier,
+          :shared_deployment_identifier,
+          :environment_deployment_identifier
+      ]
+
+      t.configuration_name = 'cert manager task'
+      t.source_directory = 'infra/cert-manager-task'
+      t.work_directory = 'build'
+
+      t.backend_config = lambda do |args|
+        deployment_identifier =
+            configuration
+                .for_overrides(args)
+                .deployment_identifier
+
+        configuration
+            .for_overrides(args)
+            .for_scope(
+                role: 'cert-manager-task',
+                deployment: deployment_identifier)
+            .backend_config
+      end
+
+      t.vars = lambda do |args|
+        deployment =
+            configuration
+                .for_overrides(args)
+                .for_scope(role: 'cert-manager-task')
+                .specific_deployment_identifier
+
+        nxt_node_config = YAML.load_file(
+            'config/secrets/nxt/%s.yaml' % deployment)
+
+        configuration
+            .for_overrides(args.to_hash.merge(
+                'version_number' => version.refresh.to_s,
+                'key_store_password' => nxt_node_config['key_store_password']))
+            .for_scope(
+                role: 'cert-manager-task',
+                deployment: deployment)
+            .vars
+      end
+    end
   end
 end
 
