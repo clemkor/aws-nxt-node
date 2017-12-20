@@ -7,6 +7,7 @@ variable "service_name" {}
 variable "version_number" {}
 
 variable "admin_password" {}
+variable "key_store_password" {}
 
 variable "peer_server_port" {}
 variable "api_server_port" {}

@@ -9,9 +9,10 @@ vars:
   version_number: "%{hiera('version_number')}"
 
   admin_password: "%{hiera('admin_password')}"
+  key_store_password: "%{hiera('key_store_password')}"
 
   peer_server_port: 7874
-  api_server_port: 7876
+  api_server_port: 443
 
   initial_blockchain_archive_path: "s3://%{hiera('blockchain_archive_bucket_name')}/%{hiera('blockchain_archive_key')}"
 

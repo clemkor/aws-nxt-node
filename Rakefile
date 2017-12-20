@@ -312,7 +312,8 @@ namespace :nxt do
         configuration
             .for_overrides(args.to_hash.merge(
                 'version_number' => version.refresh.to_s,
-                'admin_password' => nxt_node_config['admin_password']))
+                'admin_password' => nxt_node_config['admin_password'],
+                'key_store_password' => nxt_node_config['key_store_password']))
             .for_scope(
                 role: 'nxt-service',
                 deployment: deployment)

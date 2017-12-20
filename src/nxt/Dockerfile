@@ -37,7 +37,7 @@ ADD nxt-default.env /opt/nxt/conf/nxt-default.env
 RUN ["chmod", "+x", "/opt/nxt/nxt.sh"]
 
 # Expose default ports
-EXPOSE 7874 7875 7876
+EXPOSE 7874 7875 7876 443
 
 # Run startup script by default
 CMD ["/opt/nxt/nxt.sh"]

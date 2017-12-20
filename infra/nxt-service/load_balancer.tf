@@ -87,9 +87,9 @@ resource "aws_elb" "load_balancer" {
 
   listener {
     instance_port = "${var.api_server_port}"
-    instance_protocol = "HTTP"
+    instance_protocol = "TCP"
     lb_port = "${var.api_server_port}"
-    lb_protocol = "HTTP"
+    lb_protocol = "TCP"
   }
 
   health_check {
