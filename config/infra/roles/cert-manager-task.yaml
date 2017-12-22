@@ -6,7 +6,7 @@ vars:
   deployment_identifier: "%{hiera('specific_deployment_identifier')}"
   task_name: "cert-manager"
 
-  version_number: "%{hiera('version_number')}"
+  version_number: "%{hiera('cert_manager_version_number')}"
 
   secrets_bucket_name: "%{hiera('specific_storage_bucket_name')}"
 

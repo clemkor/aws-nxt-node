@@ -13,6 +13,8 @@ blockchain_archive_bucket_name: "eth-quest-nxt-node-data-%{hiera('specific_deplo
 blockchain_archive_key: "nxt-node/blockchain-archive/nxt-db.zip"
 blockchain_archive_chunk_size_bytes: 10485760
 
+cert_manager_version_number: "0.1.1"
+
 common_state_bucket_name: "eth-quest-global-storage-default"
 common_state_key: "deployment-state/common/default.tfstate"
 
@@ -25,7 +27,7 @@ cluster_state_key: "deployment-state/cluster/default.tfstate"
 nxt_image_repository_state_bucket_name: "%{hiera('shared_storage_bucket_name')}"
 nxt_image_repository_state_key: "deployment-state/nxt-image-repository/default.tfstate"
 
-cert_manager_image_repository_state_bucket_name: "%{hiera('shared_storage_bucket_name')}"
+cert_manager_image_repository_state_bucket_name: "eth-quest-cert-manager-storage-default"
 cert_manager_image_repository_state_key: "deployment-state/cert-manager-image-repository/default.tfstate"
 
 blockchain_archive_lambda_state_bucket_name: "%{hiera('specific_storage_bucket_name')}"
@@ -36,4 +38,3 @@ nxt_service_state_key: "deployment-state/nxt-service/default.tfstate"
 
 cert_manager_task_state_bucket_name: "%{hiera('specific_storage_bucket_name')}"
 cert_manager_task_state_key: "deployment-state/cert_manager-task/default.tfstate"
-

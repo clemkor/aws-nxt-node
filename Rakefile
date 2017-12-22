@@ -28,7 +28,6 @@ task :default => [
     :'bootstrap:plan',
     :'blockchain_archive_lambda:plan',
     :'nxt:image_repository:plan',
-    :'cert_manager:image_repository:plan',
     :'nxt:service:plan',
     :'cert_manager:task:plan'
 ]
@@ -266,6 +265,7 @@ namespace :nxt do
     end
 
     task :publish => [
+        'version:bump',
         'nxt:image:clean',
         'nxt:image:build',
         'nxt:image:tag',
@@ -311,7 +311,7 @@ namespace :nxt do
 
         configuration
             .for_overrides(args.to_hash.merge(
-                'version_number' => version.refresh.to_s,
+                'nxt_node_version_number' => version.refresh.to_s,
                 'admin_password' => nxt_node_config['admin_password'],
                 'key_store_password' => nxt_node_config['key_store_password']))
             .for_scope(
@@ -324,97 +324,6 @@ namespace :nxt do
 end
 
 namespace :cert_manager do
-  namespace :image_repository do
-    RakeTerraform.define_command_tasks do |t|
-      t.configuration_name = 'cert manager image repository'
-      t.source_directory = 'infra/image-repository'
-      t.work_directory = 'build'
-
-      t.backend_config = lambda do
-        configuration
-            .for_overrides(
-                shared_deployment_identifier: 'default')
-            .for_scope(
-                role: 'cert-manager-image-repository',
-                deployment: 'default')
-            .backend_config
-      end
-
-      t.vars = lambda do
-        configuration
-            .for_overrides(
-                shared_deployment_identifier: 'default')
-            .for_scope(
-                role: 'cert-manager-image-repository',
-                deployment: 'default')
-            .vars
-      end
-    end
-  end
-
-  namespace :image do
-    RakeDocker.define_image_tasks do |t|
-      t.image_name = 'aws-cert-manager'
-      t.work_directory = 'build/images'
-
-      t.copy_spec = t.copy_spec = ['src/cert-manager/.']
-
-      t.repository_name = 'eth-quest/aws-cert-manager'
-      t.repository_url = lambda do
-        configuration =
-            configuration
-                .for_overrides(
-                    shared_deployment_identifier: 'default')
-                .for_scope(
-                    role: 'cert-manager-image-repository',
-                    deployment: 'default')
-
-        backend_config = configuration.backend_config
-
-        TerraformOutput.for(
-            name: 'repository_url',
-            source_directory: 'infra/image-repository',
-            work_directory: 'build',
-            backend_config: backend_config)
-      end
-
-      t.credentials = lambda do
-        configuration =
-            configuration
-                .for_overrides(
-                    shared_deployment_identifier: 'default')
-                .for_scope(
-                    role: 'cert-manager-image-repository',
-                    deployment: 'default')
-
-        backend_config = configuration.backend_config
-        region = configuration.region
-
-        authentication_factory = RakeDocker::Authentication::ECR.new do |c|
-          c.region = region
-          c.registry_id = TerraformOutput.for(
-              name: 'registry_id',
-              source_directory: 'infra/image-repository',
-              work_directory: 'build',
-              backend_config: backend_config)
-        end
-
-        authentication_factory.call
-      end
-
-      t.tags = lambda do
-        [version.refresh.to_s, 'latest']
-      end
-    end
-
-    task :publish => [
-        'cert_manager:image:clean',
-        'cert_manager:image:build',
-        'cert_manager:image:tag',
-        'cert_manager:image:push'
-    ]
-  end
-
   namespace :task do
     RakeTerraform.define_command_tasks do |t|
       t.argument_names = [
@@ -453,7 +362,6 @@ namespace :cert_manager do
 
         configuration
             .for_overrides(args.to_hash.merge(
-                'version_number' => version.refresh.to_s,
                 'key_store_password' => nxt_node_config['key_store_password']))
             .for_scope(
                 role: 'cert-manager-task',
@@ -462,17 +370,4 @@ namespace :cert_manager do
       end
     end
   end
-end
-
-namespace :images do
-  task :publish => [
-      'version:bump',
-      'nxt:image:publish',
-      'cert_manager:image:publish'
-  ]
-end
-
-def sh_in_virtualenv command, argument_string
-  sh "#{File.expand_path('vendor/virtualenv/bin')}/#{command} " +
-         "#{argument_string}"
 end

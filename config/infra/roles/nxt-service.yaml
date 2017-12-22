@@ -6,7 +6,7 @@ vars:
   deployment_identifier: "%{hiera('specific_deployment_identifier')}"
   service_name: "nxt"
 
-  version_number: "%{hiera('version_number')}"
+  version_number: "%{hiera('nxt_node_version_number')}"
 
   admin_password: "%{hiera('admin_password')}"
   key_store_password: "%{hiera('key_store_password')}"

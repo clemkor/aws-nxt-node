@@ -1,5 +1,5 @@
 AWS NXT Node
-===============
+============
 
 An NXT node on AWS.
 
