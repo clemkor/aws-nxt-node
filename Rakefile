@@ -371,3 +371,8 @@ namespace :cert_manager do
     end
   end
 end
+
+def sh_in_virtualenv command, argument_string
+  sh "#{File.expand_path('vendor/virtualenv/bin')}/#{command} " +
+         "#{argument_string}"
+end
