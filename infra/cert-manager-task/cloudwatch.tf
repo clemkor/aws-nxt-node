@@ -1,5 +1,3 @@
-
-
 resource "aws_cloudwatch_log_group" "task" {
   name = "/${var.component}/${var.deployment_identifier}/ecs-task/${var.task_name}"
 

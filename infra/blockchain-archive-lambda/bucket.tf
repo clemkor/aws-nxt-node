@@ -1,6 +1,6 @@
 module "encrypted_bucket" {
-  source = "github.com/infrablocks/terraform-aws-encrypted-bucket?ref=0.1.2//src"
+  source = "infrablocks/encrypted-bucket/aws"
+  version = "0.1.12"
 
-  region = "${var.region}"
   bucket_name = "${var.blockchain_archive_bucket_name}"
 }

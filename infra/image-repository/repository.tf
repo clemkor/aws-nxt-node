@@ -1,6 +1,6 @@
 module "repository" {
-  source = "github.com/infrablocks/terraform-aws-ecr-repository?ref=0.1.6//src"
+  source = "infrablocks/ecr-repository/aws"
+  version = "0.1.10"
 
-  region = "${var.region}"
   repository_name = "eth-quest/${var.image_name}"
 }

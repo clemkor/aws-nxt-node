@@ -19,7 +19,8 @@ data "template_file" "task_container_definitions" {
 }
 
 module "service" {
-  source = "github.com/infrablocks/terraform-aws-ecs-service?ref=0.1.9//src"
+  source = "infrablocks/ecs-service/aws"
+  version = "0.1.12"
 
   region = "${var.region}"
   vpc_id = "${data.terraform_remote_state.network.vpc_id}"
@@ -37,7 +38,7 @@ module "service" {
   service_deployment_maximum_percent = "${var.deployment_maximum_percent}"
   service_deployment_minimum_healthy_percent = "${var.deployment_minimum_healthy_percent}"
 
-  service_elb_name = "${aws_elb.load_balancer.id}"
+  attach_to_load_balancer= "no"
 
   service_volumes = [
     {
