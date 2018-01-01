@@ -18,6 +18,28 @@ data "template_file" "task_container_definitions" {
   }
 }
 
+resource "aws_security_group_rule" "peer_server_port" {
+  security_group_id = "${data.terraform_remote_state.cluster.security_group_id}"
+
+  type = "ingress"
+
+  from_port = "${var.peer_server_port}"
+  to_port = "${var.peer_server_port}"
+  protocol = "tcp"
+  cidr_blocks = ["0.0.0.0/0"]
+}
+
+resource "aws_security_group_rule" "api_server_port" {
+  security_group_id = "${data.terraform_remote_state.cluster.security_group_id}"
+
+  type = "ingress"
+
+  from_port = "${var.api_server_port}"
+  to_port = "${var.api_server_port}"
+  protocol = "tcp"
+  cidr_blocks = ["0.0.0.0/0"]
+}
+
 module "service" {
   source = "infrablocks/ecs-service/aws"
   version = "0.1.12"
