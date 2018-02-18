@@ -1,6 +1,6 @@
 FROM openjdk:8-jre
 
-ENV NXT_VERSION="1.11.11"
+ENV NXT_VERSION="1.11.13"
 ENV NXT_SIGNING_KEY_ID="0xc654d7fcff18fd55"
 
 # Install prerequisites
