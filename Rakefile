@@ -11,7 +11,7 @@ require 'terraform_output'
 
 RakeTerraform.define_installation_tasks(
     path: File.join(Dir.pwd, 'vendor', 'terraform'),
-    version: '0.11.1')
+    version: '0.11.3')
 
 configuration = Confidante.configuration
 shared_configuration =
